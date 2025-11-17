@@ -8,7 +8,7 @@ import fs from "fs";
 import { text } from "stream/consumers";
 
 const { filePath } = workerData;
-const client = new ChromaClient();
+// const client = new ChromaClient();
 
 function cleanResumeText(text) {
     return text
@@ -54,13 +54,13 @@ async function processsPdf(prams) {
 
         const texts = await textSplitter.splitText(cleanedText);
 
-        console.log("Chunks: ", texts);
+        console.log("finle chunks: ", texts)
 
         parentPort.postMessage("PDF parse and spliting is done successfully!!!");
     } catch (error) {
         console.log("error in pdf parsing...", error);
     }
- 
+
     // fs.unlinkSync(filePath);
 }
 

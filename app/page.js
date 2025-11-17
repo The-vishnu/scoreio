@@ -29,7 +29,7 @@ export default function Home() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [fileName, click]);
+  }, [fileName, click,  setClick]);
 
   const handleChooseFile = async (e) => {
     const file = e?.target?.files[0];

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import {startPdfProcessing} from "../controller/resumeDataController.js"
 
 const router = Router();
 
@@ -9,14 +10,12 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `${uniqueSuffix}-${file.filename}`);
+    cb(null, `${uniqueSuffix}-${file.originalname}`);
   }
 });
 
 const upload = multer({ storage });
 
-router.post("/upload/pdf", upload.single('pdf') ,(req, res) => {
-    return res.json({message: "File uploaded succesfully"});
-});
+router.post("/upload/pdf", upload.single('pdf') , startPdfProcessing);
 
 export default router;
