@@ -1,0 +1,67 @@
+import { workerData, parentPort } from "worker_threads";
+import { Buffer } from "buffer";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { ChromaClient } from "chromadb";
+import { pipeline } from "@xenova/transformers";
+import fs from "fs";
+import { text } from "stream/consumers";
+
+const { filePath } = workerData;
+const client = new ChromaClient();
+
+function cleanResumeText(text) {
+    return text
+        .replace(/ï /g, "")   // weird utf-8
+        .replace(/Linkdin/gi, "LinkedIn")
+        .replace(/Stak/gi, "Stack")
+        .replace(/20\s?2\s?3/g, "2023")
+        .replace(/20\s?2\s?5/g, "2025")
+        .replace(/8.4\s?0\/10/g, "8.40/10")
+        .replace(/\s+,/g, ",") // remove space before comma
+        .replace(/ ,/g, ",")
+        .replace(/ \./g, ".")
+        .replace(/\. \./g, ".")
+        .replace(/Purpose:/g, "\nPurpose:")
+        .replace(/Ticket Price Calculator/g, "\nTicket Price Calculator")
+        .replace(/Transaction Management/g, "\nTransaction Management")
+        .replace(/Education/g, "\nEducation")
+        .trim();
+}
+
+async function processsPdf(prams) {
+
+    try {
+        console.log("Job: ", filePath);
+
+        const loadingTask = getDocument(filePath);
+        const pdf = await loadingTask.promise;
+
+        let fullText = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const strings = content.items.map(item => item.str).join(" ");
+            fullText += strings + "\n";
+        }
+        let cleanedText = cleanResumeText(fullText);
+
+        const textSplitter = new RecursiveCharacterTextSplitter({
+            chunkSize: 250,
+            chunkOverlap: 0
+        });
+
+        const texts = await textSplitter.splitText(cleanedText);
+
+        console.log("Chunks: ", texts);
+
+        parentPort.postMessage("PDF parse and spliting is done successfully!!!");
+    } catch (error) {
+        console.log("error in pdf parsing...", error);
+    }
+ 
+    // fs.unlinkSync(filePath);
+}
+
+processsPdf();
