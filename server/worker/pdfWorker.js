@@ -2,13 +2,17 @@ import { workerData, parentPort } from "worker_threads";
 import { Buffer } from "buffer";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { ChromaClient } from "chromadb";
+import { CloudClient } from "chromadb";
 import { pipeline } from "@xenova/transformers";
 import fs from "fs";
 import { text } from "stream/consumers";
 
 const { filePath } = workerData;
-// const client = new ChromaClient();
+const client = new CloudClient({
+  apiKey: process.env.CHROMA_API_KEY,
+  tenant: process.env.CHROMA_TENANT,
+  database: process.env.CHROMA_DATABASE
+});
 
 function cleanResumeText(text) {
     return text
@@ -54,6 +58,26 @@ async function processsPdf(prams) {
 
         const texts = await textSplitter.splitText(cleanedText);
 
+        const embadding = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+        const responce = await embadding(texts, {
+            pooling: "mean",
+            normalize: true
+        });
+
+        const vector = responce.tolist();
+
+        const collection = await client.getOrCreateCollection({
+            name: "resumeTextCollection"
+        });
+
+        collection.add({
+            ids: ['1'],
+            document: ['cat'],
+            embeddings: [[1, 2, 4, 6]]
+        });
+        
+
+        console.log("embaddigs: ", vector);
         console.log("finle chunks: ", texts)
 
         parentPort.postMessage("PDF parse and spliting is done successfully!!!");
