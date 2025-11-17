@@ -57,6 +57,7 @@ async function processsPdf(prams) {
         });
 
         const texts = await textSplitter.splitText(cleanedText);
+        const ids = texts.map((_, index) => `resume-001-chunk-${index}`);
 
         const embadding = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
         const responce = await embadding(texts, {
@@ -66,19 +67,22 @@ async function processsPdf(prams) {
 
         const vector = responce.tolist();
 
+        await client.deleteCollection({ name: "resumeTextCollection" });
         const collection = await client.getOrCreateCollection({
-            name: "resumeTextCollection"
+            name: "resumeTextCollection",
+            embeddingFunction: null
         });
 
-        collection.add({
-            ids: ['1'],
-            document: ['cat'],
-            embeddings: [[1, 2, 4, 6]]
+        const collectionData = collection.add({
+            ids,
+            documents: texts,
+            embeddings: vector
         });
         
 
-        console.log("embaddigs: ", vector);
-        console.log("finle chunks: ", texts)
+        // console.log("embaddigs: ", vector);
+        // console.log("finle chunks: ", texts)
+        console.log("Chroma Db stores: ", collectionData)
 
         parentPort.postMessage("PDF parse and spliting is done successfully!!!");
     } catch (error) {
