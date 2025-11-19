@@ -92,6 +92,18 @@ export default function Home() {
     setFileName(null);
   }
 
+  const handleSendResponce = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/chat", {
+        prompt: "hey hii can you plz tell me which main points should to be add in our resume"
+      });
+
+      console.log("Gemini Responce: ", response.data.output);
+    } catch (error) {
+      console.error("Axios Error:", error);
+    }
+  }
+
 
   return (
     <>
@@ -139,7 +151,7 @@ export default function Home() {
           onChange={(e) => { setInput(e.target.value) }}
           className={`justify-center mb-[-35px] items-center content-center h-[34%]`}
           placeholder="Type your message here." />
-        <Button className={`rounded-2xl cursor-pointer`}>Send</Button>
+        <Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>
       </div>
     </>
   );
