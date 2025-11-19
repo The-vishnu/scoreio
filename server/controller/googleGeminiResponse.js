@@ -1,23 +1,26 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from 'dotenv';
 
-const client = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API);
+dotenv.config();
+
+const client = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || 'AIzaSyD_bxjIZzuTc0IwfrCuXWo5rS_Mzr1kPwY');
 
 export const GoogleGeminiRespose = async (req, res) => {
     // const userPrompt = "hey hii can you plz tell me which main points should to be add in our resume";
     try {
         const { prompt } = req.body;
-        const model = client.getGenerativeModel({ model: "gemini-1.5-flash" })
+        const model = client.getGenerativeModel({ model: "gemini-2.5-pro" })
 
         const result = await model.generateContent(prompt);
-        const response = result.response;
+        const response = result.response;  
         const text = response.text();
 
         res.status(200).send({
             success: true,
-            replay: result
+            output: text
         });
 
-        console.log("Gemini Response: ", result);
+        console.log("Gemini Response: ", text);
     } catch (error) {
         console.log("Error in Gemini AI: ", error);
         res.status(500).json({
