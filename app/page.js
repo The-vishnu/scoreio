@@ -7,7 +7,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Loader2, X, Rocket, GrapeIcon, BarChart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
@@ -19,8 +19,19 @@ export default function Home() {
   const [click, setClick] = useState(true);
   const [input, setInput] = useState("");
   const [fileLoading, setFileLoading] = useState(false);
+  const scrollRef = useRef(null);
 
   console.log(input);
+
+  useEffect(() => {
+    if (!scrollRef.current) return;
+
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [ansArea, loading]);
+
 
   useEffect(() => {
     if (!fileName) return;
@@ -142,11 +153,12 @@ export default function Home() {
 
   return (
     <>
-      <div className="h-[99vh]">
+    <Toaster position="top-center" reverseOrder={false} />
+      <div className="h-screen bg-gray-400 w-full flex flex-col items-center">
 
-        <div className="h-[95vh] overflow-auto flex flex-col gap-5">
+        <div ref={scrollRef} className="flex-1 bg-red-300 overflow-y-auto p-4 flex flex-col gap-4">
           {loading && (
-            <div className="font-semibold mt-2 flex flex-col bg-slate-200 gap-4 p-3.5 h-[90vh] w-[60vw] animate-pulse">
+            <div  className="font-semibold mt-2 flex flex-col bg-slate-500 gap-4 p-3.5 h-[90vh] w-[60vw] animate-pulse">
 
               <div className="h-6 bg-gray-300 rounded w-1/2"></div>
 
@@ -159,8 +171,9 @@ export default function Home() {
             </div>
           )}
           {Array.isArray(ansArea) && ansArea.map((item, index) => (
+
             <div key={index}
-              className="font-semibold mt-2 flex flex-col gap-3 p-3.5 h-[90vh] w-[60vw]">
+              className="font-semibold mt-2 flex flex-col gap-3 p-3.5 w-[60vw]">
 
               {/* User Input */}
               <div className="text-[1.5rem] ">{item.userInput} </div>
@@ -210,9 +223,7 @@ export default function Home() {
 
         </div>
 
-
-        <div className="flex items-center gap-3 justify-between font-sans dark:bg-neutral-950 rounded-3xl px-4 py-1 shadow-lg w-[55vw] min-h-[12vh]">
-          <Toaster position="top-center" reverseOrder={false} />
+        <div className="flex absolute bottom-5 items-center bg-gray-200 gap-3 justify-between font-sans dark:bg-neutral-950 rounded-3xl px-4 py-1 shadow-lg w-[55vw] min-h-[12vh]">
           <div className="relative">
             {fileName && (
               <div className="absolute -top-14 flex items-center gap-2 bg-gray-100 dark:bg-neutral-800 px-3 py-1 rounded-xl shadow-md animate-fadeIn">
@@ -231,13 +242,18 @@ export default function Home() {
               className="flex items-center justify-center w-10 h-10 dark:bg-neutral-800 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-700 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md">{fileLoading ? <Loader2 className="animate-spin" /> : <Plus className={`${click ? '' : 'text-gray-300'}`} />}</label>
             <input onChange={handleChooseFile} disabled={!!fileName} id="fileType" className="hidden" type="file" />
           </div>
+          <div className="sticky bottom-0">
+            <div className="flex flex-row mr-[55px] justify-between">
 
-          <Textarea
-            value={input}
-            onChange={(e) => { setInput(e.target.value) }}
-            className={`justify-center mb-[-35px] items-center content-center h-[34%]`}
-            placeholder="Type your message here." />
-          <Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>
+              <Textarea
+                value={input}
+                onChange={(e) => { setInput(e.target.value) }}
+                className={`start justify-center items-center content-center w-[45vw] h-[34%]`}
+                placeholder="Type your message here." />
+              <Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>
+            </div>
+          </div>
+
         </div>
 
       </div>

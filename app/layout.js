@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
           <AppSidebar />
           <SidebarTrigger className={`cursor-pointer`}/>
           <main className="flex flex-row w-full">
-             <div className="flex flex-col gap-4 rounded-2xl bg-gray-100 h-screen w-full right-20 top-0 items-center justify-center">
+             <div className="flex flex-col gap-4 rounded-2xl bg-gray-100 h-[99vh] w-full right-20 top-0 items-center justify-center">
               
               {children}
               
