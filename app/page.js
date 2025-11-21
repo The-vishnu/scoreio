@@ -19,18 +19,22 @@ export default function Home() {
   const [click, setClick] = useState(true);
   const [input, setInput] = useState("");
   const [fileLoading, setFileLoading] = useState(false);
-  const scrollRef = useRef(null);
+  const scrollingRef = useRef(null)
 
   console.log(input);
 
   useEffect(() => {
-    if (!scrollRef.current) return;
-
-    scrollRef.current.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    scrollingRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [ansArea, loading]);
+
+  // useEffect(() => {
+  //   if(scrollRef.current){
+  //     scrollRef.current.scrollTo({
+  //       top: scrollRef.current.scrollHeight,
+  //       behavior: "smooth"
+  //     });
+  //   }
+  // }, [ansArea, loading]);
 
 
   useEffect(() => {
@@ -150,76 +154,70 @@ export default function Home() {
     }
   }
 
-
   return (
     <>
-    <Toaster position="top-center" reverseOrder={false} />
-      <div className="h-screen bg-gray-400 w-full flex flex-col items-center">
+      <Toaster position="top-center" reverseOrder={false} />
+      <div className="h-screen justify-between rounded-2xl w-full flex flex-col items-center">
 
-        <div ref={scrollRef} className="flex-1 bg-red-300 overflow-y-auto p-4 flex flex-col gap-4">
-          {loading && (
-            <div  className="font-semibold mt-2 flex flex-col bg-slate-500 gap-4 p-3.5 h-[90vh] w-[60vw] animate-pulse">
+        <div className="start mt- flex flex-col gap-10 overflow-y-auto  w-[60vw] max-h-fit h-[75vh]">
 
-              <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+          {loading ? (<div> loading...</div>) : (
+            <div className="flex flex-col gap-12">
 
-              <div className="flex gap-4 mt-4">
-                <div className="h-4 bg-gray-300 rounded w-20"></div>
-                <div className="h-4 bg-gray-300 rounded w-20"></div>
-              </div>
 
-              <div className="bg-gray-300 rounded w-full h-[50vh]"></div>
+              {Array.isArray(ansArea) && ansArea.map((item, index) => (
+                <div key={index} className=" flex flex-col gap-6">
+                  <div>
+                    <span className="text-3xl font-semibold text-gray-700">
+                      {item.userInput}
+                    </span>
+                  </div>
+
+                  {/* Option section */}
+                  <div className="flex flex-row gap-5">
+                    <div className="flex flex-row cursor-pointer">
+                      <Rocket />
+                      <p>Answar</p>
+                    </div>
+                    <div className="flex flex-row cursor-pointer">
+                      <BarChart />
+                      <p>Score</p>
+                    </div>
+                  </div>
+
+                  {/* Message area */}
+                  <div>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                      components={{
+                        h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
+                        h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
+                        h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                        p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
+                        li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
+                        strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
+                        code: ({ node, inline, ...props }) =>
+                          inline ? (
+                            <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
+                          ) : (
+                            <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
+                              <code {...props} />
+                            </pre>
+                          ),
+                      }}
+                    >
+                      {item.answar}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              ))}
+
+              <div ref={scrollingRef}></div>
+
             </div>
           )}
-          {Array.isArray(ansArea) && ansArea.map((item, index) => (
-
-            <div key={index}
-              className="font-semibold mt-2 flex flex-col gap-3 p-3.5 w-[60vw]">
-
-              {/* User Input */}
-              <div className="text-[1.5rem] ">{item.userInput} </div>
-
-              {/* Tabs */}
-              <div className="text-[1rem] gap-1 w-[55vw] h-[50px] flex flex-row">
-                <div className="relative cursor-pointer flex flex-row gap-1 items-center justify-center">
-                  <Rocket size={18} />
-                  <p>Answer</p>
-                </div>
-
-                <div className="relative ml-24 cursor-pointer flex flex-row gap-1 items-center justify-center">
-                  <BarChart size={18} />
-                  Score
-                </div>
-              </div>
-
-              {/* Answer */}
-              <div className="prose prose-slate">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw, rehypeHighlight]}
-                  components={{
-                    h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
-                    h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
-                    h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-                    p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
-                    ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
-                    li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
-                    strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
-                    code: ({ node, inline, ...props }) =>
-                      inline ? (
-                        <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
-                      ) : (
-                        <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
-                          <code {...props} />
-                        </pre>
-                      ),
-                  }}
-                >
-                  {item.answar}
-                </ReactMarkdown>
-              </div>
-
-            </div>
-          ))}
 
         </div>
 
