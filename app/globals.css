@@ -4,6 +4,24 @@
 @custom-variant dark (&:is(.dark *));
 
 
+
+/* Hide scrollbar for Chrome, Safari, Opera */
+.scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.scroll-hide {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for IE/Edge */
+.scroll-hide {
+  -ms-overflow-style: none;
+}
+
+
+
 @layer base {
   :root {
     --sidebar: oklch(0.985 0 0);

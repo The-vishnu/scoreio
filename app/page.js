@@ -154,39 +154,64 @@ export default function Home() {
     }
   }
 
+  
+
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
       <div className="h-screen justify-between rounded-2xl w-full flex flex-col items-center">
 
-        <div className="start mt- flex flex-col gap-10 overflow-y-auto  w-[60vw] max-h-fit h-[75vh]">
-
-          {loading ? (<div> loading...</div>) : (
-            <div className="flex flex-col gap-12">
+        <div className="start mt-2 flex flex-col gap-10 scroll-hide overflow-y-auto  w-[60vw] max-h-fit h-[80vh]">
 
 
-              {Array.isArray(ansArea) && ansArea.map((item, index) => (
-                <div key={index} className=" flex flex-col gap-6">
-                  <div>
-                    <span className="text-3xl font-semibold text-gray-700">
-                      {item.userInput}
-                    </span>
+          <div className="flex flex-col gap-12">
+            {Array.isArray(ansArea) && ansArea.map((item, index) => (
+              <div key={index} className=" flex flex-col gap-6">
+                <div>
+                  <span className="text-3xl font-semibold text-gray-700">
+                    {item.userInput}
+                  </span>
+                </div>
+
+                {/* Option section */}
+                <div className="flex flex-row gap-5">
+                  <div className="flex flex-row cursor-pointer">
+                    <Rocket />
+                    <p>Answar</p>
                   </div>
-
-                  {/* Option section */}
-                  <div className="flex flex-row gap-5">
-                    <div className="flex flex-row cursor-pointer">
-                      <Rocket />
-                      <p>Answar</p>
-                    </div>
-                    <div className="flex flex-row cursor-pointer">
-                      <BarChart />
-                      <p>Score</p>
-                    </div>
+                  <div className="flex flex-row cursor-pointer">
+                    <BarChart />
+                    <p>Score</p>
                   </div>
+                </div>
 
-                  {/* Message area */}
-                  <div>
+                {/* Message area */}
+                <div>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                    components={{
+                      h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
+                      h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
+                      h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                      p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
+                      ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
+                      li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
+                      strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
+                      code: ({ node, inline, ...props }) =>
+                        inline ? (
+                          <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
+                        ) : (
+                          <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
+                            <code {...props} />
+                          </pre>
+                        ),
+                    }}
+                  >
+                    {item.answar}
+                  </ReactMarkdown>
+                </div>
+                {/* <div>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       rehypePlugins={[rehypeRaw, rehypeHighlight]}
@@ -210,14 +235,18 @@ export default function Home() {
                     >
                       {item.answar}
                     </ReactMarkdown>
-                  </div>
-                </div>
-              ))}
+                  </div> */}
+              </div>
+            ))}
+            
+            {loading && (
+              <div className="animate-pulse text-gray-500 text-xl">
+                Thinking...
+              </div>)}
 
-              <div ref={scrollingRef}></div>
+            <div ref={scrollingRef} className="h-[15vh]"></div>
 
-            </div>
-          )}
+          </div>
 
         </div>
 
