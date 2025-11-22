@@ -6,10 +6,13 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Loader2, X, Rocket, GrapeIcon, BarChart } from "lucide-react";
+import { Plus, Loader2, X, Rocket, GrapeIcon, BarChart, PauseCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
+import Typed from "typed.js";
+import { marked } from "marked";
+
 
 export default function Home() {
   const AnswerArea = [];
@@ -19,23 +22,32 @@ export default function Home() {
   const [click, setClick] = useState(true);
   const [input, setInput] = useState("");
   const [fileLoading, setFileLoading] = useState(false);
-  const scrollingRef = useRef(null)
+  const scrollingRef = useRef(null);
+  const [displayText, setDisplayText] = useState("");
 
-  console.log(input);
+  const lastMessage = ansArea[ansArea.length - 1];
+  useEffect(() => {
+    if (!lastMessage?.answar) return;
+    setDisplayText("");
+
+    let i = 0;
+    const text = lastMessage.answar;
+
+    const interval = setInterval(() => {
+      if (i >= text.length) {
+        return () => clearInterval(interval);
+      } else {
+        console.log("i:", i, "char:", text[i]);
+        setDisplayText(prev => prev + text[i-1]);
+        i++;
+      }
+
+    }, 10);
+  }, [lastMessage?.answar]);
 
   useEffect(() => {
     scrollingRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [ansArea, loading]);
-
-  // useEffect(() => {
-  //   if(scrollRef.current){
-  //     scrollRef.current.scrollTo({
-  //       top: scrollRef.current.scrollHeight,
-  //       behavior: "smooth"
-  //     });
-  //   }
-  // }, [ansArea, loading]);
-
 
   useEffect(() => {
     if (!fileName) return;
@@ -154,101 +166,111 @@ export default function Home() {
     }
   }
 
-  
+
 
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="h-screen justify-between rounded-2xl w-full flex flex-col items-center">
+      <div className={`h-screen ${ansArea.length === 0 ? ("justify-center") : ("justify-between")} rounded-2xl w-full flex flex-col items-center`}>
+        {ansArea.length === 0 ? (
+          <div className="text-2xl font-semibold animate-pulse">Check your Resume now! </div>
+        ) : (
+          <div className="start mt-2 flex flex-col gap-10 scroll-hide overflow-y-auto  w-[60vw] max-h-fit h-[80vh]">
 
-        <div className="start mt-2 flex flex-col gap-10 scroll-hide overflow-y-auto  w-[60vw] max-h-fit h-[80vh]">
 
-
-          <div className="flex flex-col gap-12">
-            {Array.isArray(ansArea) && ansArea.map((item, index) => (
-              <div key={index} className=" flex flex-col gap-6">
-                <div>
-                  <span className="text-3xl font-semibold text-gray-700">
-                    {item.userInput}
-                  </span>
-                </div>
-
-                {/* Option section */}
-                <div className="flex flex-row gap-5">
-                  <div className="flex flex-row cursor-pointer">
-                    <Rocket />
-                    <p>Answar</p>
+            <div className="flex flex-col gap-12">
+              {Array.isArray(ansArea) && ansArea.map((item, index) => (
+                <div key={index} className=" flex flex-col gap-6">
+                  <div>
+                    <span className="text-3xl font-semibold text-gray-700">
+                      {item.userInput}
+                    </span>
                   </div>
-                  <div className="flex flex-row cursor-pointer">
-                    <BarChart />
-                    <p>Score</p>
+
+                  {/* Option section */}
+                  <div className="flex flex-row gap-5">
+                    <div className="flex flex-row cursor-pointer">
+                      <Rocket />
+                      <p>Answar</p>
+                    </div>
+                    <div className="flex flex-row cursor-pointer">
+                      <BarChart />
+                      <p>Score</p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Message area */}
-                <div>
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw, rehypeHighlight]}
-                    components={{
-                      h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
-                      h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
-                      h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-                      p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
-                      ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
-                      li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
-                      strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
-                      code: ({ node, inline, ...props }) =>
-                        inline ? (
-                          <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
-                        ) : (
-                          <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
-                            <code {...props} />
-                          </pre>
-                        ),
-                    }}
-                  >
-                    {item.answar}
-                  </ReactMarkdown>
-                </div>
-                {/* <div>
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      rehypePlugins={[rehypeRaw, rehypeHighlight]}
-                      components={{
-                        h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
-                        h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
-                        h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-                        p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
-                        ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
-                        li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
-                        strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
-                        code: ({ node, inline, ...props }) =>
-                          inline ? (
-                            <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
-                          ) : (
-                            <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
-                              <code {...props} />
-                            </pre>
-                          ),
-                      }}
-                    >
-                      {item.answar}
-                    </ReactMarkdown>
-                  </div> */}
-              </div>
-            ))}
-            
-            {loading && (
-              <div className="animate-pulse text-gray-500 text-xl">
-                Thinking...
-              </div>)}
+                  {/* Message area */}
+                  {index === ansArea.length - 1 ? (
+                     <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                        components={{
+                          h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
+                          h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
+                          h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                          p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
+                          li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
+                          strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
+                          code: ({ node, inline, ...props }) =>
+                            inline ? (
+                              <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
+                            ) : (
+                              <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
+                                <code {...props} />
+                              </pre>
+                            ),
+                        }}
+                      >
+                        {displayText}
+                      </ReactMarkdown>
+                  ) : (
+                    <div >
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                        components={{
+                          h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
+                          h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
+                          h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                          p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
+                          li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
+                          strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
+                          code: ({ node, inline, ...props }) =>
+                            inline ? (
+                              <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
+                            ) : (
+                              <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
+                                <code {...props} />
+                              </pre>
+                            ),
+                        }}
+                      >
+                        {item.answar}
+                      </ReactMarkdown>
+                    </div>
+                    
+                  )}
 
-            <div ref={scrollingRef} className="h-[15vh]"></div>
+
+
+                </div>
+              ))}
+
+              {loading && (
+                <div className=" text-gray-500 text-xl">
+                  <p className="animate-pulse">Thinking...</p>
+                </div>)}
+
+              <div ref={scrollingRef} className="h-[15vh]"></div>
+
+            </div>
 
           </div>
+        )}
 
-        </div>
+
 
         <div className="flex absolute bottom-5 items-center bg-gray-200 gap-3 justify-between font-sans dark:bg-neutral-950 rounded-3xl px-4 py-1 shadow-lg w-[55vw] min-h-[12vh]">
           <div className="relative">
@@ -277,7 +299,8 @@ export default function Home() {
                 onChange={(e) => { setInput(e.target.value) }}
                 className={`start justify-center items-center content-center w-[45vw] h-[34%]`}
                 placeholder="Type your message here." />
-              <Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>
+              {loading ? (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}><PauseCircleIcon size={10} /></Button>) : (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>)}
+
             </div>
           </div>
 
