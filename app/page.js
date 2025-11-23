@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Loader2, X, Rocket, GrapeIcon, BarChart, PauseCircleIcon } from "lucide-react";
+import { Plus, Loader2, X, Rocket, GrapeIcon, BarChart, PauseCircleIcon, AudioLines } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
@@ -24,25 +24,30 @@ export default function Home() {
   const [fileLoading, setFileLoading] = useState(false);
   const scrollingRef = useRef(null);
   const [displayText, setDisplayText] = useState("");
+  const [isTyping, setTyping] = useState(false);
 
   const lastMessage = ansArea[ansArea.length - 1];
   useEffect(() => {
     if (!lastMessage?.answar) return;
     setDisplayText("");
+    setTyping(true);
 
     let i = 0;
     const text = lastMessage.answar;
 
     const interval = setInterval(() => {
-      if (i >= text.length) {
-        return () => clearInterval(interval);
-      } else {
+      if (i < text.length) {
         console.log("i:", i, "char:", text[i]);
-        setDisplayText(prev => prev + text[i-1]);
+        setDisplayText(prev => prev + text[i - 1]);
         i++;
+      } else {
+        clearInterval(interval);
+        setTyping(false);
       }
 
-    }, 10);
+      return () => clearInterval(interval);
+
+    }, 3);
   }, [lastMessage?.answar]);
 
   useEffect(() => {
@@ -126,7 +131,8 @@ export default function Home() {
     setFileName(null);
   }
 
-  const handleSendResponce = async () => {
+  const handleSendResponce = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true)
       const response = await axios.post("http://localhost:5000/api/chat", {
@@ -166,6 +172,13 @@ export default function Home() {
     }
   }
 
+  const handleEnterPress = (e) => {
+    if(e.key === "Enter"){
+      e.preventDefault();
+      handleSendResponce(e);
+    }
+  }
+
 
 
   return (
@@ -201,29 +214,29 @@ export default function Home() {
 
                   {/* Message area */}
                   {index === ansArea.length - 1 ? (
-                     <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw, rehypeHighlight]}
-                        components={{
-                          h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
-                          h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
-                          h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-                          p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
-                          ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
-                          li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
-                          strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
-                          code: ({ node, inline, ...props }) =>
-                            inline ? (
-                              <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
-                            ) : (
-                              <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
-                                <code {...props} />
-                              </pre>
-                            ),
-                        }}
-                      >
-                        {displayText}
-                      </ReactMarkdown>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                      components={{
+                        h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-4 mb-2" {...props} />,
+                        h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold mt-4 mb-2" {...props} />,
+                        h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                        p: ({ node, ...props }) => <p className="mb-3 text-gray-800" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-3" {...props} />,
+                        li: ({ node, ...props }) => <li className="leading-relaxed mb-1" {...props} />,
+                        strong: ({ node, ...props }) => <strong className="font-bold text-black" {...props} />,
+                        code: ({ node, inline, ...props }) =>
+                          inline ? (
+                            <code className="px-1 py-0.5 bg-gray-200 rounded text-sm" {...props} />
+                          ) : (
+                            <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg overflow-auto text-sm mb-3">
+                              <code {...props} />
+                            </pre>
+                          ),
+                      }}
+                    >
+                      {displayText}
+                    </ReactMarkdown>
                   ) : (
                     <div >
                       <ReactMarkdown
@@ -250,7 +263,7 @@ export default function Home() {
                         {item.answar}
                       </ReactMarkdown>
                     </div>
-                    
+
                   )}
 
 
@@ -297,9 +310,10 @@ export default function Home() {
               <Textarea
                 value={input}
                 onChange={(e) => { setInput(e.target.value) }}
+                onKeyDown={handleEnterPress}
                 className={`start justify-center items-center content-center w-[45vw] h-[34%]`}
                 placeholder="Type your message here." />
-              {loading ? (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}><PauseCircleIcon size={10} /></Button>) : (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}>Send</Button>)}
+              {loading || isTyping ? (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}><PauseCircleIcon size={10} /></Button>) : (<Button onClick={handleSendResponce} className={`rounded-2xl cursor-pointer`}><AudioLines size={10} /></Button>)}
 
             </div>
           </div>

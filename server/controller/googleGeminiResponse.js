@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const client = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API || 'AIzaSyD_bxjIZzuTc0IwfrCuXWo5rS_Mzr1kPwY');
+const client = new GoogleGenerativeAI(`${process.env.GOOGLE_GEMINI_API}`);
 
 export const GoogleGeminiRespose = async (req, res) => {
     // const userPrompt = "hey hii can you plz tell me which main points should to be add in our resume";
