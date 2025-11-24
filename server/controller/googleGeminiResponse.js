@@ -9,6 +9,7 @@ export const GoogleGeminiRespose = async (req, res) => {
     // const userPrompt = "hey hii can you plz tell me which main points should to be add in our resume";
     try {
         const { prompt } = req.body;
+        
         const model = client.getGenerativeModel({
             model: "gemini-2.5-pro",
             systemInstruction: `You are highly smart, advanced, intelligent and strictly professional Resume Review & ATS Analysis Assistant.

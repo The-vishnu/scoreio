@@ -184,7 +184,7 @@ export default function Home() {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className={`h-screen ${ansArea.length === 0 ? ("justify-center") : ("justify-between")} rounded-2xl w-full flex flex-col items-center`}>
+      <div className={`h-screen ${ansArea.length === 0 ? ("justify-center") : ("justify-between")} bg-gray-100 rounded-2xl w-full flex flex-col items-center`}>
         {ansArea.length === 0 ? (
           <div className="text-2xl font-semibold animate-pulse">Check your Resume now! </div>
         ) : (
@@ -285,10 +285,10 @@ export default function Home() {
 
 
 
-        <div className="flex absolute bottom-5 items-center bg-gray-200 gap-3 justify-between font-sans dark:bg-neutral-950 rounded-3xl px-4 py-1 shadow-lg w-[55vw] min-h-[12vh]">
+        <div className="flex absolute bottom-5 items-center bg-gray-300 gap-3 justify-between font-sans dark:bg-neutral-950 rounded-3xl px-4 py-1 shadow-lg w-[55vw] min-h-[12vh]">
           <div className="relative">
             {fileName && (
-              <div className="absolute -top-14 flex items-center gap-2 bg-gray-100 dark:bg-neutral-800 px-3 py-1 rounded-xl shadow-md animate-fadeIn">
+              <div className="absolute -top-14 flex items-center gap-2 bg-gray-200 dark:bg-neutral-800 px-3 py-1 rounded-xl shadow-md animate-fadeIn">
                 <p className="text-xs text-gray-700 dark:text-gray-200 truncate max-w-[120px]">
                   {fileName.name}
                 </p>
@@ -304,8 +304,8 @@ export default function Home() {
               className="flex items-center justify-center w-10 h-10 dark:bg-neutral-800 rounded-full hover:bg-gray-200 dark:hover:bg-neutral-700 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md">{fileLoading ? <Loader2 className="animate-spin" /> : <Plus className={`${click ? '' : 'text-gray-300'}`} />}</label>
             <input onChange={handleChooseFile} disabled={!!fileName} id="fileType" className="hidden" type="file" />
           </div>
-          <div className="sticky bottom-0">
-            <div className="flex flex-row mr-[55px] justify-between">
+          <div className=" sticky bottom-0">
+            <div className="flex flex-row mr-[55px] items-center justify-between">
 
               <Textarea
                 value={input}
