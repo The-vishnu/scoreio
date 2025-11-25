@@ -6,7 +6,7 @@ export const startPdfProcessing = async (req, res) =>{
 
     //recive the file
     console.log("File is recived");
-    console.log("file path: ", filePath);
+    console.log("file path: ", filePath); 
 
     const worker = new Worker("./worker/pdfWorker.js", {
         workerData: { filePath: filePath }
