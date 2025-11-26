@@ -139,9 +139,11 @@ export default function Home() {
         prompt: input
       });
 
-      const ans = response.data.output
+      const ans = response.data.output;
+      const atsResponse = response.data.json;
 
-      console.log("Gemini Responce: ", ans);
+      console.log("Gemini Responce: ", ans);   
+      console.log("Extracted json: ", atsResponse);
       setAnsArea(prev => [...prev,
       {
         userInput: input,

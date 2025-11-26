@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ResourcesSearching } from "../controller/chromaDbSearching.js";
 import dotenv from 'dotenv';
-import { json } from "express";
+import { json, text } from "express";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ export const GoogleGeminiRespose = async (req, res) => {
 
         const Resources = await ResourcesSearching(prompt);
         // const resumeAnalytics = [];
-        
+
         const model = client.getGenerativeModel({
             model: "gemini-2.5-pro",
             systemInstruction: `You are a highly smart, advanced, intelligent and strictly professional Resume Review & ATS Analysis Assistant with integrated knowledge retrieval.
@@ -53,7 +53,7 @@ In this mode:
 MODE 2: RESUME REVIEW MODE (STRICT)
 ====================================================
 This mode activates ONLY when:
-1. The user explicitly uploads a resume file (PDF/DOCX/TXT), OR check the resources for once to find from ${Resources}
+1. The user explicitly uploads a resume file (PDF/DOCX/TXT), if you did not recive any pdf from the user then check the resources for once to find resume information from it ${Resources}
 2. The user pastes resume text, OR fetch from the ${Resources} once you get listen to the user
 3. The user says:
    - "check my resume"
@@ -82,9 +82,9 @@ When activated:
   "best_fit_roles": []
 }
 
-Then print:
----
-Then provide a short friendly explanation (max 6 sentences).
+Then print and Then provide a short friendly explanation (max 6 to 10 sentences).
+
+-----
 
 RULES:
 - Do NOT hallucinate.
@@ -125,22 +125,37 @@ IMPORTANT GLOBAL RULES
         const text = response.text();
         // console.log("Resume analysis: ", resumeAnalytics);
         console.log("Gemini Response: ", text);
-        try {
-        const start = text.indexOf("{");
-        const end = text.lastIndexOf("}");
 
-        if (start === -1 || end === -1) return null;
-        const jsonString = text.substring(start, end+1);
-        console.log("Json responce text: ", JSON.parse(jsonString));
+        let jsonString = null;
+        try {
+            const start = text.indexOf("{");
+            const end = text.lastIndexOf("}");
+
+            if (start !== -1 && end !== -1) {
+                jsonString = text.substring(start, end + 1);
+
+                try {
+                    JSON.parse(jsonString);
+                } catch (error) {
+                    jsonString = null;
+                }
+            }
+
+            // if (start !== -1 || end !== -1) return null;
+            // jsonString = text.substring(start, end+1);
+            // console.log("Json responce text: ", JSON.parse(jsonString));
 
         } catch (error) {
+            jsonString = null;
             console.log("json not found");
         }
+
+        console.log("Json string: ", jsonString);
 
         res.status(201).json({
             success: true,
             output: text,
-            json: jsonString
+            json: jsonString || " "
         });
 
     } catch (error) {
