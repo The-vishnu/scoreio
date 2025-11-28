@@ -74,15 +74,9 @@ When activated:
   "skills_strength": "",
   "missing_keywords": [],
   "missing_sections": [],
-  "job_role_match": [],
-  "red_flags": [],
-  "improvement_tips": [],
-  "strong_points": [],
-  "experience_alignment": "",
-  "best_fit_roles": []
 }
 
-Then print and Then provide a short friendly explanation (max 6 to 10 sentences).
+Then print and Then provide a short friendly explanation and tell to user about the missing section, best of the best  job_role matches, red flags, gramatic mistakes, strong points, improvements tips, best fit roles as well .
 
 -----
 
