@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Link from "next/link"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -37,7 +38,7 @@ export default function Home() {
 
     const interval = setInterval(() => {
       if (i < text.length) {
-        console.log("i:", i, "char:", text[i]);
+        // console.log("i:", i, "char:", text[i]);
         setDisplayText(prev => prev + text[i - 1]);
         i++;
       } else {
@@ -142,7 +143,7 @@ export default function Home() {
       const ans = response.data.output;
       const atsResponse = response.data.json;
 
-      console.log("Gemini Responce: ", ans);   
+      console.log("Gemini Responce: ", ans);
       console.log("Extracted json: ", atsResponse);
       setAnsArea(prev => [...prev,
       {
@@ -175,7 +176,7 @@ export default function Home() {
   }
 
   const handleEnterPress = (e) => {
-    if(e.key === "Enter"){
+    if (e.key === "Enter") {
       e.preventDefault();
       handleSendResponce(e);
     }
@@ -208,10 +209,12 @@ export default function Home() {
                       <Rocket />
                       <p>Answar</p>
                     </div>
-                    <div className="flex flex-row cursor-pointer">
-                      <BarChart />
-                      <p>Score</p>
-                    </div>
+                    <Link href="/dashboard">
+                      <div className="flex flex-row cursor-pointer">
+                        <BarChart />
+                        <p>Score</p>
+                      </div>
+                    </Link>
                   </div>
 
                   {/* Message area */}

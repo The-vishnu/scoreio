@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
+import axios from 'axios'
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,7 +16,33 @@ import {
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export default function DonutChart() {
-  const ATSscore = 80;
+  const [resuemData, setResumeData] = useState(null);
+  const [missingSection, setMissingData] = useState([]);
+  useEffect(() => {
+    async function loadResumeData() {
+      const res = await axios.post("http://localhost:5000/api/chat");
+
+       const atsResponse = res.data.json;
+       setResumeData(atsResponse);
+    }
+
+    loadResumeData();
+  }, []);
+
+
+
+  const ATSscore = resuemData?.ats_score ?? 0;
+  const HiringChances = resuemData?.hiring_chances ?? 0;
+  const GramerScore = resuemData?.grammar_score ?? 0;
+  
+  useEffect(() => {
+    if (resuemData) {
+      setMissingData(resuemData.missing_keywords_and_missing_sections || []);
+    }
+  }, [resuemData]);
+
+  console.log("Resuemdata: ", resuemData);
+  console.log("Missing sectino: ", missingSection);
 
   // ⭐ FIXED: 5 colors for 5 labels
   const barData = {
@@ -58,32 +85,64 @@ export default function DonutChart() {
     },
   };
 
-  const donutData = useMemo(() => ({
+  const ATSdonutData = useMemo(() => ({
     labels: ["Score", "Remaining"],
     datasets: [
       {
         data: [ATSscore, 100 - ATSscore],
-        backgroundColor: ["#60a5fa", "#e5e7eb"],
+        backgroundColor: ["#fca5a5 ", "#e5e7eb"],
         borderWidth: 0,
       },
     ],
   }), [ATSscore]);
 
-  const donutOptions = {
+  const ATSdonutOptions = {
+    cutout: "70%",
+    plugins: { tooltip: { enabled: true }, legend: { display: false } },
+  };
+
+  const GamerdonutData = useMemo(() => ({
+    labels: ["Score", "Remaining"],
+    datasets: [
+      {
+        data: [GramerScore, 100 - GramerScore],
+        backgroundColor: ["#86efac ", "#e5e7eb"],
+        borderWidth: 0,
+      },
+    ],
+  }), [GramerScore]);
+
+  const GramerdonutOptions = {
+    cutout: "70%",
+    plugins: { tooltip: { enabled: true }, legend: { display: false } },
+  };
+
+  const HiringdonutData = useMemo(() => ({
+    labels: ["Score", "Remaining"],
+    datasets: [
+      {
+        data: [HiringChances, 100 - HiringChances],
+        backgroundColor: ["#fde68a", "#e5e7eb"],
+        borderWidth: 0,
+      },
+    ],
+  }), [HiringChances]);
+
+  const HiringdonutOptions = {
     cutout: "70%",
     plugins: { tooltip: { enabled: true }, legend: { display: false } },
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen w-full h-screen rounded-2xl flex justify-center items-start py-10">
+    <div className="bg-gray-100 min-h-screen w-full h-screen rounded-2xl flex justify-center items-start py-3">
 
-      <div className="flex flex-col gap-8 w-[95%] max-w-6xl">
+      <div className="flex flex-col gap-2 w-[95%] max-w-6xl">
 
         {/* ⭐ DONUT ROW (3 donuts, perfect spacing) */}
         <div className="flex flex-wrap justify-center gap-8 bg-slate-50 p-6 rounded-2xl">
 
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="relative w-40 h-40">
+          {/* {[1, 2, 3].map((item) => (
+            <div key={item} className={`relative w-40 h-40`}>
               <Doughnut data={donutData} options={donutOptions} />
 
               <div className="absolute inset-0 flex flex-col items-center justify-center font-bold text-xl text-gray-800">
@@ -93,17 +152,66 @@ export default function DonutChart() {
                 </span>
               </div>
             </div>
-          ))}
+          ))} */}
 
+          <div className={`relative w-40 h-40 bg-red-100 rounded-2xl p-4`}>
+            <Doughnut data={ATSdonutData} options={ATSdonutOptions} />
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-[22px] text-xs opacity-70 font-bold tracking-wide text-gray-800">
+              {ATSscore}%
+              <span className="text-xs text-gray-500 font-normal mt-1">
+                ATS Score
+              </span>
+            </div>
+          </div>
+
+          <div className={`relative w-40 h-40 bg-yellow-100 rounded-2xl p-4`}>
+            <Doughnut data={HiringdonutData} options={HiringdonutOptions} />
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-[22px] text-xs opacity-70 font-bold tracking-wide text-gray-800">
+              {HiringChances}%
+              <span className="text-xs text-gray-500 font-normal mt-1">
+                Hiring Chances
+              </span>
+            </div>
+          </div>
+
+          <div className={`relative w-40 h-40 bg-green-100 rounded-2xl p-4`}>
+            <Doughnut data={GamerdonutData} options={GramerdonutOptions} />
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-[22px] text-xs opacity-70 font-bold tracking-wide text-gray-800">
+              {GramerScore}%
+              <span className="text-xs text-gray-500 font-normal mt-1">
+                Grmaer Score
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* ⭐ Horizontal Bar Section */}
-        <div className="bg-slate-50 rounded-2xl p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Profile Strength Breakdown</h2>
+        <div className=" flex flex-row gap-3.5">
+          <div className="bg-slate-50 w-[50%] rounded-2xl p-6">
+            <div>
+              <h2 className="text-lg font-semibold mb-4 text-gray-700">Profile Strength Breakdown</h2>
 
-          <div className="w-full h-72">
-            <Bar data={barData} options={barOptions} />
+              <div className="w-full h-72">
+                <Bar data={barData} options={barOptions} />
+              </div>
+            </div>
           </div>
+
+          <div className="bg-slate-50 w-[50%] rounded-2xl p-6">
+            <div>
+              <h2 className="text-lg font-semibold mb-4 text-gray-700">Missing KeyWord & Sections</h2>
+
+              <div className="w-full h-72 flex flex-row gap-2.5">
+                {missingSection.map((itme, index) => {
+                  <p key={index} className="bg-sky-200 w-fit h-10 text-sm font-bold text[15px] opacity-70 rounded-2xl p-2.5">{itme}</p>
+                })}
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>

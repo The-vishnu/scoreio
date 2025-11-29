@@ -68,15 +68,14 @@ When activated:
 
 {
   "ats_score": 0-100,
-  "overall_strength": "",
-  "clarity_score": 0-100,
+  "hiring_chances": 0-100,
   "grammar_score": 0-100,
+  "overall_strength": "",
   "skills_strength": "",
-  "missing_keywords": [],
-  "missing_sections": [],
+  "missing_keywords_and_missing_sections": [],
 }
 
-Then print and Then provide a short friendly explanation and tell to user about the missing section, best of the best  job_role matches, red flags, gramatic mistakes, strong points, improvements tips, best fit roles as well .
+Then print and Then provide a short friendly explanation and tell to user about the missing section, best of the best  job_role matches, red flags, gramatic mistakes, strong points, improvements tips, best fit roles, missing keywords, missing section as well.
 
 -----
 
