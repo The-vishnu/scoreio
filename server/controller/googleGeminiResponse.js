@@ -69,7 +69,7 @@ When activated:
 {
   "ats_score": 0-100,
   "hiring_chances": 0-100,
-  "grammar_score": 0-100,
+  "grammar_score": 0-100,  
   "overall_strength": "",
   "skills_strength": "",
   "missing_keywords_and_missing_sections": [],

@@ -18,16 +18,6 @@ ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearS
 export default function DonutChart() {
   const [resuemData, setResumeData] = useState(null);
   const [missingSection, setMissingData] = useState([]);
-  useEffect(() => {
-    async function loadResumeData() {
-      const res = await axios.post("http://localhost:5000/api/chat");
-
-       const atsResponse = res.data.json;
-       setResumeData(atsResponse);
-    }
-
-    loadResumeData();
-  }, []);
 
 
 
