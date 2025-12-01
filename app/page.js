@@ -140,11 +140,25 @@ export default function Home() {
         prompt: input
       });
 
+    
       const ans = response.data.output;
+      console.log("ans: ", ans);
       const atsResponse = response.data.json;
 
+      // localStorage.setItem("ats-data", JSON.st(atsResponse));
+      let finalData = null;
+      try {
+        finalData = JSON.parse(atsResponse);
+      } catch (error) {
+        console.error("Failed to parse ATS JSON:", error);
+      }
+
+      if(finalData) {
+        localStorage.setItem("ats-data", JSON.stringify(finalData));
+      }
+
       console.log("Gemini Responce: ", ans);
-      console.log("Extracted json: ", atsResponse);
+      console.log("Extracted json: ", finalData);
       setAnsArea(prev => [...prev,
       {
         userInput: input,
@@ -169,6 +183,7 @@ export default function Home() {
           secondary: "#fef2f2", // matches background
         },
       });
+      localStorage.setItem("ans-data", ansArea);
       console.error("Axios Error:", error);
     } finally {
       setLoading(false);

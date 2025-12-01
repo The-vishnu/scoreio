@@ -72,7 +72,7 @@ When activated:
   "grammar_score": 0-100,  
   "overall_strength": "",
   "skills_strength": "",
-  "missing_keywords_and_missing_sections": [],
+  "missing_keywords_and_missing_sections": [], --> give word by word names in that
 }
 
 Then print and Then provide a short friendly explanation and tell to user about the missing section, best of the best  job_role matches, red flags, gramatic mistakes, strong points, improvements tips, best fit roles, missing keywords, missing section as well.

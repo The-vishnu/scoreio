@@ -19,20 +19,53 @@ export default function DonutChart() {
   const [resuemData, setResumeData] = useState(null);
   const [missingSection, setMissingData] = useState([]);
 
-
-
-  const ATSscore = resuemData?.ats_score ?? 0;
-  const HiringChances = resuemData?.hiring_chances ?? 0;
-  const GramerScore = resuemData?.grammar_score ?? 0;
-  
   useEffect(() => {
-    if (resuemData) {
-      setMissingData(resuemData.missing_keywords_and_missing_sections || []);
+    const stored = localStorage.getItem("ats-data");
+
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      console.log("parsed: ", parsed.ats_score);
+      setResumeData(parsed);
+
+      setMissingData(parsed.missing_keywords_and_missing_sections || []);
     }
-  }, [resuemData]);
+  }, []);
 
   console.log("Resuemdata: ", resuemData);
   console.log("Missing sectino: ", missingSection);
+
+  useEffect(() => {
+    if (!resuemData) return;
+
+    console.log("🎯 FINAL RESUME DATA:", resuemData);
+    console.log("ATS RAW:", resuemData.ats_score);
+    console.log("TYPE:", typeof resuemData.ats_score);
+
+    setMissingData(resuemData.missing_keywords_and_missing_sections || []);
+  }, [resuemData]);
+
+  if (!resuemData) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center text-gray-500">
+        Loading dashboard…
+      </div>
+    );
+  }
+
+
+
+
+  console.log("ATS RAW:", resuemData.ats_score);
+  console.log("TYPE:", typeof resuemData.ats_score);
+  // const ATSscore = 90
+  // const GramerScore = 80
+  // const HiringChances = 70
+  const ATSscore = resuemData?.ats_score ?? 0;
+  const GramerScore = resuemData?.grammar_score ?? 0;
+  const HiringChances = resuemData?.hiring_chances ?? 0;
+
+
+
 
   // ⭐ FIXED: 5 colors for 5 labels
   const barData = {
@@ -80,7 +113,7 @@ export default function DonutChart() {
     datasets: [
       {
         data: [ATSscore, 100 - ATSscore],
-        backgroundColor: ["#fca5a5 ", "#e5e7eb"],
+        backgroundColor: ["#fca5a5", "#e5e7eb"],
         borderWidth: 0,
       },
     ],
@@ -96,7 +129,7 @@ export default function DonutChart() {
     datasets: [
       {
         data: [GramerScore, 100 - GramerScore],
-        backgroundColor: ["#86efac ", "#e5e7eb"],
+        backgroundColor: ["#86efac", "#e5e7eb"],
         borderWidth: 0,
       },
     ],
@@ -194,10 +227,10 @@ export default function DonutChart() {
             <div>
               <h2 className="text-lg font-semibold mb-4 text-gray-700">Missing KeyWord & Sections</h2>
 
-              <div className="w-full h-72 flex flex-row gap-2.5">
-                {missingSection.map((itme, index) => {
-                  <p key={index} className="bg-sky-200 w-fit h-10 text-sm font-bold text[15px] opacity-70 rounded-2xl p-2.5">{itme}</p>
-                })}
+              <div className="w-full h-72 grid grid-cols-3 gap-4">
+                {missingSection.map((itme, index) => (
+                  <p key={index} className="bg-sky-200 w-fit h-fit text-sm font-bold text[15px] opacity-70 rounded-2xl p-2.5">{itme}</p>
+                ))}
               </div>
             </div>
           </div>
